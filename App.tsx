@@ -39,14 +39,23 @@ const processData = (lancamentos: Lancamento[], year: number): CategoriaData[] =
         categories[l.categoria].lancamentos.push(l);
     });
 
-    // Special sorting: 'RESULTADO ASOS' first, then alphabetical.
+    // Special sorting logic for categories
     return Object.values(categories).sort((a, b) => {
-        if (a.nome === 'RESULTADO ASOS') return -1;
-        if (b.nome === 'Receita de Vendas') return -1;
-        if (b.nome === 'Receita de Vendas') return 1;
-        if (a.nome.startsWith('Receita')) return -1;
-        if (b.nome.startsWith('Receita')) return 1;
-        return a.nome.localeCompare(b.nome)
+        const getOrder = (name: string) => {
+            if (name === 'RESULTADO ASOS') return 1;
+            if (name === 'Receita de Vendas') return 2;
+            if (name.startsWith('Receita')) return 3;
+            return 4;
+        };
+
+        const orderA = getOrder(a.nome);
+        const orderB = getOrder(b.nome);
+
+        if (orderA !== orderB) {
+            return orderA - orderB;
+        }
+
+        return a.nome.localeCompare(b.nome);
     });
 };
 
