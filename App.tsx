@@ -1,12 +1,13 @@
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Lancamento, CategoriaData, Kpi } from './types';
-import { generateFinancialData } from './services/geminiService';
+import { mockLancamentos } from './services/mockData';
 import { useTheme } from './hooks/useTheme';
 import { Header } from './components/Header';
 import { Toolbar } from './components/Toolbar';
 import { KpiCard } from './components/KpiCard';
 import { FinancialTable } from './components/FinancialTable';
-import { ArrowPathIcon, CheckIcon } from './components/icons';
+import { CheckIcon } from './components/icons';
 
 const formatCurrency = (value: number): string => {
   if (value === 0) return '0';
@@ -41,18 +42,17 @@ const processData = (lancamentos: Lancamento[], year: number): CategoriaData[] =
     // Special sorting: 'RESULTADO ASOS' first, then alphabetical.
     return Object.values(categories).sort((a, b) => {
         if (a.nome === 'RESULTADO ASOS') return -1;
-        if (b.nome === 'RESULTADO ASOS') return 1;
-        if (a.nome === 'Receita de Vendas') return -1;
+        if (b.nome === 'Receita de Vendas') return -1;
         if (b.nome === 'Receita de Vendas') return 1;
+        if (a.nome.startsWith('Receita')) return -1;
+        if (b.nome.startsWith('Receita')) return 1;
         return a.nome.localeCompare(b.nome)
     });
 };
 
 export default function App() {
   const [theme, toggleTheme] = useTheme();
-  const [lancamentos, setLancamentos] = useState<Lancamento[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [allLancamentos] = useState<Lancamento[]>(mockLancamentos);
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [categoryFilter, setCategoryFilter] = useState('');
   
@@ -60,27 +60,9 @@ export default function App() {
   const [selectedFiliais, setSelectedFiliais] = useState<string[]>(allFiliais);
   const [dateRange, setDateRange] = useState<{ start: string; end: string }>({ start: '', end: '' });
 
-
-  const fetchAndSetData = useCallback(async (year: number) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await generateFinancialData(year);
-      setLancamentos(data);
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchAndSetData(selectedYear);
-  }, [fetchAndSetData, selectedYear]);
+  const lancamentos = useMemo(() => {
+    return allLancamentos.filter(l => new Date(l.data).getFullYear() === selectedYear);
+  }, [allLancamentos, selectedYear]);
 
   const globallyFilteredLancamentos = useMemo(() => {
     return lancamentos.filter(l => {
@@ -144,44 +126,25 @@ export default function App() {
       <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
         <Header theme={theme} toggleTheme={toggleTheme} year={selectedYear} />
         
-        {loading && (
-            <div className="flex justify-center items-center h-96 bg-light-card dark:bg-dark-card rounded-xl shadow-sm mt-6">
-                <div className="text-center">
-                    <ArrowPathIcon className="w-8 h-8 mx-auto animate-spin text-brand-500"/>
-                    <p className="mt-2 text-light-muted dark:text-dark-muted">Gerando dados financeiros com IA...</p>
-                </div>
-            </div>
-        )}
-        
-        {error && (
-            <div className="flex justify-center items-center h-96 bg-light-card dark:bg-dark-card rounded-xl shadow-sm text-bad-500 p-4 mt-6">
-                <p><strong>Erro:</strong> {error}</p>
-            </div>
-        )}
-        
-        {!loading && !error && (
-          <>
-            <Toolbar 
-              selectedYear={selectedYear}
-              onYearChange={setSelectedYear}
-              categoryFilter={categoryFilter}
-              onCategoryFilterChange={setCategoryFilter}
-              allFiliais={allFiliais}
-              selectedFiliais={selectedFiliais}
-              onFilialChange={setSelectedFiliais}
-              dateRange={dateRange}
-              onDateRangeChange={setDateRange}
-            />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              {kpis.map(kpi => <KpiCard key={kpi.label} {...kpi} />)}
-            </div>
-            <FinancialTable 
-              data={filteredData} 
-              formatCurrency={formatCurrency}
-              year={selectedYear} 
-            />
-          </>
-        )}
+        <Toolbar 
+            selectedYear={selectedYear}
+            onYearChange={setSelectedYear}
+            categoryFilter={categoryFilter}
+            onCategoryFilterChange={setCategoryFilter}
+            allFiliais={allFiliais}
+            selectedFiliais={selectedFiliais}
+            onFilialChange={setSelectedFiliais}
+            dateRange={dateRange}
+            onDateRangeChange={setDateRange}
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {kpis.map(kpi => <KpiCard key={kpi.label} {...kpi} />)}
+        </div>
+        <FinancialTable 
+            data={filteredData} 
+            formatCurrency={formatCurrency}
+            year={selectedYear} 
+        />
       </div>
     </div>
   );
