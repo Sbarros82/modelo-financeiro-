@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Painel Financeiro com IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+            },
+            colors: {
+              'brand': {
+                '500': '#60a5fa',
+                '600': '#2563eb',
+              },
+              'ok': {
+                '500': '#22c55e',
+                '600': '#16a34a',
+              },
+              'bad': {
+                '500': '#ef4444',
+                '600': '#dc2626',
+              },
+              // Light theme
+              light: {
+                bg: '#f7fafc',
+                card: '#ffffff',
+                text: '#0f172a',
+                muted: '#475569',
+                line: '#d9e0e8',
+                chip: '#eef6ff',
+                'chip-bd': '#cfe2ff',
+              },
+              // Dark theme
+              dark: {
+                bg: '#0b1220',
+                card: '#0f172a',
+                text: '#e2e8f0',
+                muted: '#94a3b8',
+                line: '#1e293b',
+                chip: '#122036',
+                'chip-bd': '#1e3a5f',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      /* Fallback for initial load */
+      body {
+        background-color: #0b1220;
+        font-family: 'Inter', sans-serif;
+      }
+      .dark body {
+        background-color: #0b1220;
+      }
+      .light body {
+        background-color: #f7fafc;
+      }
+       /* Custom scrollbar for a better look */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: #1e293b;
+        border-radius: 20px;
+        border: 2px solid #0f172a;
+      }
+       .dark ::-webkit-scrollbar-thumb {
+        background-color: #334155;
+        border-color: #0f172a;
+      }
+      .light ::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-color: #ffffff;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-light-bg dark:bg-dark-bg text-dark-text dark:text-light-text antialiased">
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>

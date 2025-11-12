@@ -1,0 +1,5 @@
+{
+  "name": "modelo painel Financeiro",
+  "description": "An interactive financial dashboard that uses Gemini to generate and display categorized financial data. Features include dynamic filtering, expandable transaction details, and light/dark theme support.",
+  "requestFramePermissions": []
+}
